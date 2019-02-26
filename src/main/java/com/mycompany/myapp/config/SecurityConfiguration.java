@@ -52,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.problemSupport = problemSupport;
     }
 
-    @InjectService
+    @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.ldapAuthentication().userSearchBase("o=myO, ou=myOu")
             .userSearchFilter("(uid={0})")
