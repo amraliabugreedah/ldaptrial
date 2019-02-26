@@ -57,7 +57,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.ldapAuthentication()
-            .userSearchBase("ou=users,ou=system")
+            .userSearchBase("uid=admin1,ou=users,ou=system")
+//            .userSearchBase("o=myO,ou=myOu") //don't add the base
+            .userSearchFilter("(objectClass=person)")
+//            .groupSearchBase("ou=Groups") //don't add the base
+//            .groupSearchFilter("member={0}")
             .contextSource(getContextSource());
     }
 
@@ -91,7 +95,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        final BCryptPasswordEncoder crypt = new BCryptPasswordEncoder();
+        return new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                // Prefix so that apache directory understands that bcrypt has been used.
+                // Without this, it assumes SSHA and fails during authentication.
+
+                System.out.println("jiii:"  + "{CRYPT}" + crypt.encode(rawPassword));
+                return "{CRYPT}" + crypt.encode(rawPassword);
+            }
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                // remove {CRYPT} prefix
+                System.out.println("jiii:"  + crypt.matches(rawPassword, encodedPassword.substring(7)));
+                return crypt.matches(rawPassword, encodedPassword.substring(7));
+            }};
     }
 
     @Override

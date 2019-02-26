@@ -58,18 +58,24 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
         BindAuthenticator bindAuth = new BindAuthenticator(ldapContextSource);
         FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(
-            "", "(uid={0})",
+            "", "(objectClass=*)",
             ldapContextSource);
 
         try {
+            System.out.println("wwwoohoo111");
             bindAuth.setUserSearch(userSearch);
             bindAuth.afterPropertiesSet();
+            System.out.println("wwwoohoo2222");
+
         } catch (Exception ex) {
             java.util.logging.Logger
                 .getLogger(CustomAuthenticationManager.class.getName())
                 .log(Level.SEVERE, null, ex);
+            System.out.println("wwwoohoo2121");
         }
+        System.out.println("wwwoohoo3333");
         provider = new LdapAuthenticationProvider(bindAuth);
+        System.out.println("wwwoohoo4444");
         provider.setUserDetailsContextMapper(new UserDetailsContextMapper() {
             @Override
                 public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
