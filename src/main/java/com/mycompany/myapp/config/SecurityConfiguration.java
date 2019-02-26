@@ -3,11 +3,13 @@ package com.mycompany.myapp.config;
 import com.mycompany.myapp.security.*;
 import com.mycompany.myapp.security.jwt.*;
 
+import org.hibernate.service.spi.InjectService;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -24,6 +26,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
 import javax.annotation.PostConstruct;
+import javax.naming.ldap.LdapContext;
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +50,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
+    }
+
+    @InjectService
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
+        auth.ldapAuthentication().userSearchBase("o=myO, ou=myOu")
+            .userSearchFilter("(uid={0})")
+            .groupSearchBase("ou=Groups")
+            .groupSearchFilter("member={0}")
+            .contextSource(getContextSource());
+    }
+    @Bean
+    public LdapContextSource getContextSource(){
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl("ldap://172.20.10.5:8080");
+        contextSource.setBase("dc=mycompany,dc=com");
+        contextSource.setUserDn("cn=aUserUid,dc=mycompany,dc=com");
+        contextSource.setPassword("hisPassword");
+        contextSource.afterPropertiesSet();
+        return contextSource;
     }
 
     @PostConstruct
