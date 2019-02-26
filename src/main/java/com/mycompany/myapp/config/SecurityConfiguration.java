@@ -8,6 +8,7 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,19 +56,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
-        auth.ldapAuthentication().userSearchBase("o=myO, ou=myOu")
-            .userSearchFilter("(uid={0})")
-            .groupSearchBase("ou=Groups")
-            .groupSearchFilter("member={0}")
+        auth.ldapAuthentication()
+            .userSearchBase("ou=users,ou=system")
             .contextSource(getContextSource());
     }
+
     @Bean
     public LdapContextSource getContextSource(){
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl("ldap://172.20.10.5:8080");
-        contextSource.setBase("dc=mycompany,dc=com");
-        contextSource.setUserDn("cn=aUserUid,dc=mycompany,dc=com");
-        contextSource.setPassword("hisPassword");
+        contextSource.setUrl("ldap://localhost:10389");
+        contextSource.setBase("dc=example,dc=com");
+        contextSource.setUserDn("uid=admin,ou=system");
+        contextSource.setPassword("secret");
         contextSource.afterPropertiesSet();
         return contextSource;
     }

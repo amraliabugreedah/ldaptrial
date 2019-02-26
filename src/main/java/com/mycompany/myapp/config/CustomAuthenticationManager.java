@@ -7,6 +7,8 @@ import com.mycompany.myapp.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.support.LdapContextSource;
@@ -31,6 +33,7 @@ import java.util.logging.Level;
 
 
 @Component
+@Primary
 public class CustomAuthenticationManager implements AuthenticationManager {
 
     LdapAuthenticationProvider provider = null;
@@ -38,6 +41,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationManager.class);
 
     private final UserRepository userRepository;
+
 
     @Autowired
     private final LdapContextSource ldapContextSource;
@@ -49,8 +53,8 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        log.debug("AUTHENTICATION Login" + authentication.getName());
-        log.debug("AUTHENTICATION Password" + authentication.getCredentials().toString());
+        log.debug("AUTHENTICATION Login " + authentication.getName());
+        log.debug("AUTHENTICATION Password " + authentication.getCredentials().toString());
 
         BindAuthenticator bindAuth = new BindAuthenticator(ldapContextSource);
         FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(
@@ -68,12 +72,14 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         provider = new LdapAuthenticationProvider(bindAuth);
         provider.setUserDetailsContextMapper(new UserDetailsContextMapper() {
             @Override
-            public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
+                public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
+                System.out.println("koko2");
                 Optional<User> isUser = userRepository.findOneWithAuthoritiesByLogin(username);
+
                 final User user = isUser.get();
                 Set<Authority> userAuthorities = user.getAuthorities();
                 Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-                for(Authority a: userAuthorities){
+                for (Authority a : userAuthorities) {
                     GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(a.getName());
                     grantedAuthorities.add(grantedAuthority);
                 }
