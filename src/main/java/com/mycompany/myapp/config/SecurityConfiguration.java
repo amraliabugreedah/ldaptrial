@@ -57,9 +57,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.ldapAuthentication()
-            .userSearchBase("uid=admin1,ou=users,ou=system")
+            .userSearchBase("ou=User,ou=ActiveMQ,ou=system")
 //            .userSearchBase("o=myO,ou=myOu") //don't add the base
-            .userSearchFilter("(objectClass=person)")
+            .userSearchFilter("(objectClass=*)")
 //            .groupSearchBase("ou=Groups") //don't add the base
 //            .groupSearchFilter("member={0}")
             .contextSource(getContextSource());
@@ -95,22 +95,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        final BCryptPasswordEncoder crypt = new BCryptPasswordEncoder();
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                // Prefix so that apache directory understands that bcrypt has been used.
-                // Without this, it assumes SSHA and fails during authentication.
-
-                System.out.println("jiii:"  + "{CRYPT}" + crypt.encode(rawPassword));
-                return "{CRYPT}" + crypt.encode(rawPassword);
-            }
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                // remove {CRYPT} prefix
-                System.out.println("jiii:"  + crypt.matches(rawPassword, encodedPassword.substring(7)));
-                return crypt.matches(rawPassword, encodedPassword.substring(7));
-            }};
+        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -147,7 +132,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/authenticate").permitAll()
             .antMatchers("/api/account/reset-password/init").permitAll()
             .antMatchers("/api/account/reset-password/finish").permitAll()
-            .antMatchers("/api/**").authenticated()
+            .antMatchers("/api/**").permitAll()
             .antMatchers("/management/health").permitAll()
             .antMatchers("/management/info").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
