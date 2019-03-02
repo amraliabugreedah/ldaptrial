@@ -43,13 +43,19 @@ public class UserJWTController {
 
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(loginVM.getUsername(), hashedPassword);
-
+        System.out.println("wwwoohoo0000");
         Authentication authentication = this.authenticationManager.authenticate(authenticationToken);
+        System.out.println("wwwoohoo01");
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        System.out.println("wwwoohoo02");
         boolean rememberMe = (loginVM.isRememberMe() == null) ? false : loginVM.isRememberMe();
+        System.out.println("wwwoohoo03");
         String jwt = tokenProvider.createToken(authentication, rememberMe);
+        System.out.println("wwwoohoo04");
         HttpHeaders httpHeaders = new HttpHeaders();
+        System.out.println("wwwoohoo05");
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        System.out.println("wwwoohoo06");
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 

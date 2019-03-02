@@ -78,7 +78,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         System.out.println("wwwoohoo4444");
         provider.setUserDetailsContextMapper(new UserDetailsContextMapper() {
             @Override
-                public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
+            public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
                 System.out.println("koko2");
                 Optional<User> isUser = userRepository.findOneWithAuthoritiesByLogin(username);
 
@@ -94,7 +94,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
             @Override
             public void mapUserToContext(UserDetails userDetails, DirContextAdapter dirContextAdapter) {
-
+                System.out.println("hello yooo! ");
             }
         });
         return provider.authenticate(authentication);
