@@ -31,8 +31,10 @@ public final class SecurityUtils {
                     LdapUserDetails ldapUser = (LdapUserDetails) authentication.getPrincipal();
                     System.out.println("this is ldapUsername returned");
                     return ldapUser.getUsername();
+                } else {
+                    System.out.println("Security Utils: " + authentication.getPrincipal().toString());
+                    return authentication.getPrincipal() + ": Anon";
                 }
-                return null;
             });
     }
 

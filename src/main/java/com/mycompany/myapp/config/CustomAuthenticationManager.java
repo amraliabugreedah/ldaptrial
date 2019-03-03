@@ -43,9 +43,10 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private final UserRepository userRepository;
 
 
-    @Autowired
+
     private final LdapContextSource ldapContextSource;
 
+    @Autowired
     public CustomAuthenticationManager(UserRepository userRepository, LdapContextSource ldapContextSource) {
         this.userRepository = userRepository;
         this.ldapContextSource = ldapContextSource;
@@ -58,7 +59,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
         BindAuthenticator bindAuth = new BindAuthenticator(ldapContextSource);
         FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(
-            "", "(objectClass=*)",
+            "ou=User,ou=ActiveMQ,ou=system", "(objectClass=*)",
             ldapContextSource);
 
         try {
@@ -75,6 +76,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         }
         System.out.println("wwwoohoo3333");
         provider = new LdapAuthenticationProvider(bindAuth);
+
         System.out.println("wwwoohoo4444");
         provider.setUserDetailsContextMapper(new UserDetailsContextMapper() {
             @Override

@@ -65,6 +65,7 @@ public class UserJWTController {
             byte[] messageDigest = md.digest(input.getBytes());
             BigInteger num = new BigInteger(1, messageDigest);
             String hashText = num.toString(16);
+            System.out.println("Hello Hashy" + hashText);
             while (hashText.length() < 32) {
                 hashText = "0" + hashText;
             }

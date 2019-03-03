@@ -57,8 +57,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
         auth.ldapAuthentication()
-            .userSearchBase("ou=User,ou=ActiveMQ,ou=system")
-//            .userSearchBase("o=myO,ou=myOu") //don't add the base
+//            .userSearchBase("ou=User,ou=ActiveMQ")
+            .userSearchBase("o=myO,ou=myOu") //don't add the base
             .userSearchFilter("(objectClass=*)")
 //            .groupSearchBase("ou=Groups") //don't add the base
 //            .groupSearchFilter("member={0}")
@@ -69,7 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public LdapContextSource getContextSource(){
         LdapContextSource contextSource = new LdapContextSource();
         contextSource.setUrl("ldap://localhost:10389");
-        contextSource.setBase("dc=example,dc=com");
+        contextSource.setBase("");
         contextSource.setUserDn("uid=admin,ou=system");
         contextSource.setPassword("secret");
         contextSource.afterPropertiesSet();
