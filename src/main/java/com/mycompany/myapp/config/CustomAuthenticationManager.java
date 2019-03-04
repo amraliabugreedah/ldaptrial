@@ -25,10 +25,8 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
+import javax.naming.directory.Attributes;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -41,7 +39,6 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationManager.class);
 
     private final UserRepository userRepository;
-
 
 
     private final LdapContextSource ldapContextSource;
@@ -59,7 +56,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
         BindAuthenticator bindAuth = new BindAuthenticator(ldapContextSource);
         FilterBasedLdapUserSearch userSearch = new FilterBasedLdapUserSearch(
-            "ou=User,ou=ActiveMQ,ou=system", "(objectClass=*)",
+            "ou=User,ou=ActiveMQ,ou=system", "(objectClass=person)",
             ldapContextSource);
 
         try {
@@ -78,20 +75,38 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         provider = new LdapAuthenticationProvider(bindAuth);
 
         System.out.println("wwwoohoo4444");
-        provider.setUserDetailsContextMapper(new UserDetailsContextMapper() {
+        provider.setUserDetailsContextMapper(new LdapUserDetailsMapper() {
             @Override
             public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> collection) {
                 System.out.println("koko2");
-                Optional<User> isUser = userRepository.findOneWithAuthoritiesByLogin(username);
-
-                final User user = isUser.get();
-                Set<Authority> userAuthorities = user.getAuthorities();
+                System.out.println(username);
                 Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-                for (Authority a : userAuthorities) {
-                    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(a.getName());
-                    grantedAuthorities.add(grantedAuthority);
-                }
-                return new org.springframework.security.core.userdetails.User(username, "1", grantedAuthorities);
+                 grantedAuthorities.add(new SimpleGrantedAuthority("Ädmin"));
+                Attributes attrListOuter = dirContextOperations.getAttributes();
+                System.out.println(attrListOuter.toString());
+//                Optional<User> isUser = userRepository.findOneByLogin(username);
+//                    List<User> x = userRepository.findAll();
+//                    System.out.println(x.get(0));
+//                    System.out.println(x.get(1));
+//                    System.out.println(x.get(2));
+//                    System.out.println(x.get(3));
+//                System.out.println("UserRepo" + isUser.toString());
+//                System.out.println("UserRepo" + userRepository);
+//                if (isUser.isPresent()) {
+//                    System.out.println("User Found");
+//                    final User user = isUser.get();
+//
+//                    Set<Authority> userAuthorities = user.getAuthorities();
+//
+//                    Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+//                    for (Authority a : userAuthorities) {
+//                        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(a.getName());
+//                        grantedAuthorities.add(grantedAuthority);
+//                    }
+//
+//                    return new org.springframework.security.core.userdetails.User(username, "1", grantedAuthorities);
+//                }
+                return new org.springframework.security.core.userdetails.User(username, "", true, true, true, true, grantedAuthorities);
             }
 
             @Override
@@ -99,6 +114,11 @@ public class CustomAuthenticationManager implements AuthenticationManager {
                 System.out.println("hello yooo! ");
             }
         });
-        return provider.authenticate(authentication);
+
+        Authentication authenticationReturned = provider.authenticate(authentication);
+        System.out.println("AuthReturned start");
+        System.out.println("AuthReturned" + authenticationReturned.toString());
+        System.out.println("AuthReturned end");
+        return authenticationReturned;
     }
 }

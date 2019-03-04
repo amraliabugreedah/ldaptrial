@@ -42,10 +42,14 @@ public class UserJWTController {
         System.out.println(hashedPassword);
 
         UsernamePasswordAuthenticationToken authenticationToken =
-            new UsernamePasswordAuthenticationToken(loginVM.getUsername(), hashedPassword);
+            new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
         System.out.println("wwwoohoo0000");
         Authentication authentication = this.authenticationManager.authenticate(authenticationToken);
         System.out.println("wwwoohoo01");
+        System.out.println(authentication.getCredentials());
+        System.out.println(authentication.getPrincipal());
+        System.out.println(authentication.getDetails());
+        System.out.println(authentication.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         System.out.println("wwwoohoo02");
         boolean rememberMe = (loginVM.isRememberMe() == null) ? false : loginVM.isRememberMe();
